@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
+    protected $fillable = ['login', 'email', 'phone', 'password'];
+
     public function index()
     {
         return self::all();
@@ -18,12 +20,13 @@ class User extends Model
         return self::find($id);
     }
 
-    public function create($request)
+    public function create($data)
     {
-        var_dump($request);
-        /*return self::create([
-
-        ]);*/
+        $this->login = $data['login'];
+        $this->email = $data['email'];
+        $this->phone = $data['phone'];
+        $this->password = password_hash($data['password'], PASSWORD_DEFAULT); // password_verify() for check password
+        return $this->save();
     }
 
     /*public function update($request)
