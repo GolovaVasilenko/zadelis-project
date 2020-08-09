@@ -1,0 +1,44 @@
+version: "3.1"
+services:
+  nginx:
+    image: tutum/nginx
+    ports:
+      - "80:80"
+    links:
+      - php-fpm
+    volumes:
+      - ./nginx/default:/etc/nginx/sites-available/default
+      - ./nginx/default:/etc/nginx/sites-enabled/default
+
+      - ./logs/nginx-access.log:/var/log/nginx/access.log
+      - ./logs/nginx-error.log:/var/log/nginx/error.log
+
+  php-fpm:
+    build: ./docker/php
+    links:
+      - db
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./api:/home/alex/www/zadelis/api
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: p@ssw0rd
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    links:
+      - db
+    ports:
+      - "8183:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_USERNAME: root
+      NYSQL_ROOT_PASSWORD: p@ssw0rd
